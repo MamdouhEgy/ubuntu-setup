@@ -1,0 +1,149 @@
+sudo apt update && sudo apt upgrade
+sudo apt install timeshift
+sudo apt install keepass2 -y
+sudo apt install wget -y
+sudo apt install build-essential git -y
+sudo apt install nano -y 
+sudo apt install unzip unrar -y
+sudo apt install htop glances -y
+sudo apt install net-tools nmap -y
+sudo apt install vlc ffmpeg -y
+sudo apt install libreoffice -y
+sudo snap install --classic code 
+sudo apt install gedit -y
+sudo apt install terminator -y
+sudo apt-get install sshfs -y
+sudo apt install neofetch -y
+sudo apt install gnome-shell-extensions -y
+sudo apt install gnome-tweaks -y
+sudo apt install --install-suggests gnome-software -y
+sudo apt-get install autoconf automake libtool curl make g++ unzip -y
+sudo apt install cmake -y
+sudo apt install gimp -y
+sudo apt install trash-cli
+sudo snap install screencloud
+sudo apt-get install -y putty
+sudo apt install tmux -y
+sudo apt install bat -y
+sudo apt install python3-pip
+sudo apt install telegram-desktop
+sudo apt install snapd
+sudo snap install sumatrapdf
+sudo apt-get -y install rabbitvcs-nautilus
+sudo apt-get install zsh -y
+
+
+
+
+
+
+
+sudo apt update
+sudo apt install -y software-properties-common
+sudo add-apt-repository ppa:fish-shell/release-4
+sudo apt update
+sudo apt install -y fish # Autocomplete, support plugins and easy folders switch (alt+ --> or alt + <--).
+chsh -s "$(command -v fish)"    # To make fish my default shell
+
+fish
+curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
+fisher install gazorby/fish-abbreviation-tips
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sudo apt install screenkey
+
+# install uv
+sudo apt install -y ca-certificates build-essential
+curl -LsSf https://astral.sh/uv/install.sh | sh
+uv python install 3.12
+
+# install jupyterlab
+mkdir jupyterenv
+cd jupyterenv
+uv init
+uv python pin 3.12
+uv add jupyterlab ipykernel
+uv run jupyter lab
+
+
+
+sudo apt install pipx
+pipx install tldr
+
+#CIP POOL
+
+sudo apt install diodon -y
+sudo apt install terminator -y
+sudo snap install code --classic
+sudo apt install meld -y
+sudo apt install okular -y
+sudo apt install krop -y
+sudo apt install hdfview -y
+sudo apt install inkscape -y
+sudo apt install gimp -y
+sudo apt install gnome-system-monitor -y
+sudo apt install baobab -y
+sudo apt install remmina -y
+
+
+
+
+
+#Install Helix Editor
+sudo add-apt-repository ppa:maveonair/helix-editor
+sudo apt update
+sudo apt install helix
+
+
+
+
+# Eza listing tool
+sudo mkdir -p /etc/apt/keyrings
+wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
+echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list
+sudo apt update
+sudo apt install eza
+
+# Indicator Stickynotes
+sudo add-apt-repository ppa:umang/indicator-stickynotes
+sudo apt-get update
+sudo apt-get install indicator-stickynotes -y
+
+
+
+sudo apt install hstr -y (from ubuntu21.10)
+Install hstr in ubuntu21.04 and older:
+    sudo add-apt-repository ppa:ultradvorka/ppa
+    sudo apt-get update
+    sudo apt-get install hstr
+
+
+# Show Tree
+sudo apt-get install tree
+
+# Kazam Screen Capture
+sudo apt install kazam
+
+# Install Pinta from Pinta
+sudo add-apt-repository ppa:pinta-maintainers/pinta-stable
+sudo apt-get update
+sudo apt-get install pinta 
+
+
+#########################################################
+sudo apt install software-properties-common apt-transport-https -y
+#########################################################
+
+sudo apt install filezilla -y

@@ -1,0 +1,289 @@
+# Taskfile for provisioning a fresh Ubuntu installation.
+# Source: "UbuntuApps for new installation.txt"
+# Runner: https://taskfile.dev  (install with: sudo snap install task --classic)
+#
+# Usage:
+#   task -l                # list all tasks
+#   task all               # run everything (non-interactive parts)
+#   task base              # core CLI utilities
+#   task dev               # dev toolchain
+#   task gui               # GUI apps
+#   task shells            # fish + zsh setup
+#   task python            # uv + jupyterlab
+#   task cip-pool          # CIP Pool workstation extras
+#   task extras            # helix, eza, stickynotes, hstr, tree, kazam, pinta, filezilla
+#
+# Notes:
+#   - Tasks are idempotent where apt allows (apt install is safe to re-run).
+#   - Steps requiring user interaction (chsh, jupyter lab) are isolated in their
+#     own tasks so `task all` will not block. Run them manually when desired.
+
+version: '3'
+
+silent: false
+
+vars:
+  APT_INSTALL: sudo DEBIAN_FRONTEND=noninteractive apt-get install -y
+  APT_UPDATE:  sudo apt-get update
+
+tasks:
+
+  default:
+    desc: Show available tasks
+    cmds:
+      - task -l
+
+  # -----------------------------------------------------------------------
+  # Aggregate task: run the full non-interactive provisioning.
+  # -----------------------------------------------------------------------
+  all:
+    desc: Run the full non-interactive provisioning sequence
+    cmds:
+      - task: update
+      - task: base
+      - task: dev
+      - task: net
+      - task: media
+      - task: office
+      - task: gui
+      - task: build-tools
+      - task: utilities
+      - task: shells-install
+      - task: python
+      - task: pipx
+      - task: cip-pool
+      - task: extras
+
+  # -----------------------------------------------------------------------
+  # System update
+  # -----------------------------------------------------------------------
+  update:
+    desc: apt update && upgrade
+    cmds:
+      - "{{.APT_UPDATE}}"
+      - sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
+
+  # -----------------------------------------------------------------------
+  # Base CLI utilities
+  # -----------------------------------------------------------------------
+  base:
+    desc: Core CLI utilities (wget, nano, unzip, htop, glances, neofetch, tmux, bat, trash-cli)
+    cmds:
+      - "{{.APT_INSTALL}} timeshift"
+      - "{{.APT_INSTALL}} keepass2"
+      - "{{.APT_INSTALL}} wget"
+      - "{{.APT_INSTALL}} nano"
+      - "{{.APT_INSTALL}} unzip unrar"
+      - "{{.APT_INSTALL}} htop glances"
+      - "{{.APT_INSTALL}} neofetch"
+      - "{{.APT_INSTALL}} tmux"
+      - "{{.APT_INSTALL}} bat"
+      - "{{.APT_INSTALL}} trash-cli"
+      - "{{.APT_INSTALL}} sshfs"
+      - "{{.APT_INSTALL}} putty"
+
+  # -----------------------------------------------------------------------
+  # Networking
+  # -----------------------------------------------------------------------
+  net:
+    desc: Networking tools (net-tools, nmap)
+    cmds:
+      - "{{.APT_INSTALL}} net-tools nmap"
+
+  # -----------------------------------------------------------------------
+  # Dev toolchain
+  # -----------------------------------------------------------------------
+  dev:
+    desc: Developer toolchain (build-essential, git, cmake, VS Code)
+    cmds:
+      - "{{.APT_INSTALL}} build-essential git"
+      - "{{.APT_INSTALL}} cmake"
+      - "{{.APT_INSTALL}} python3-pip"
+      - sudo snap install --classic code
+
+  build-tools:
+    desc: Autotools and friends required by some source builds
+    cmds:
+      - "{{.APT_INSTALL}} autoconf automake libtool curl make g++ unzip"
+      - "{{.APT_INSTALL}} software-properties-common apt-transport-https"
+
+  # -----------------------------------------------------------------------
+  # Multimedia
+  # -----------------------------------------------------------------------
+  media:
+    desc: VLC, ffmpeg, gimp
+    cmds:
+      - "{{.APT_INSTALL}} vlc ffmpeg"
+      - "{{.APT_INSTALL}} gimp"
+
+  # -----------------------------------------------------------------------
+  # Office / productivity
+  # -----------------------------------------------------------------------
+  office:
+    desc: LibreOffice, Telegram, sumatrapdf, filezilla
+    cmds:
+      - "{{.APT_INSTALL}} libreoffice"
+      - "{{.APT_INSTALL}} telegram-desktop"
+      - "{{.APT_INSTALL}} snapd"
+      - sudo snap install sumatrapdf
+      - "{{.APT_INSTALL}} filezilla"
+
+  # -----------------------------------------------------------------------
+  # GUI / desktop integration
+  # -----------------------------------------------------------------------
+  gui:
+    desc: GNOME tweaks, extensions, gedit, terminator, screencloud, rabbitvcs
+    cmds:
+      - "{{.APT_INSTALL}} gedit"
+      - "{{.APT_INSTALL}} terminator"
+      - "{{.APT_INSTALL}} gnome-shell-extensions"
+      - "{{.APT_INSTALL}} gnome-tweaks"
+      - sudo DEBIAN_FRONTEND=noninteractive apt-get install --install-suggests -y gnome-software
+      - sudo snap install screencloud
+      - "{{.APT_INSTALL}} rabbitvcs-nautilus"
+
+  # -----------------------------------------------------------------------
+  # Misc utilities pulled in later in the source file
+  # -----------------------------------------------------------------------
+  utilities:
+    desc: screenkey, ca-certificates
+    cmds:
+      - "{{.APT_INSTALL}} screenkey"
+      - "{{.APT_INSTALL}} ca-certificates build-essential"
+
+  # -----------------------------------------------------------------------
+  # Shells: fish (with fisher + tips) and zsh
+  # `shells-install` is non-interactive. `shells-fish-default` calls chsh
+  # and must be run manually.
+  # -----------------------------------------------------------------------
+  shells-install:
+    desc: Install zsh, fish (PPA), fisher, and fish-abbreviation-tips
+    cmds:
+      - "{{.APT_INSTALL}} zsh"
+      - "{{.APT_INSTALL}} software-properties-common"
+      - sudo add-apt-repository -y ppa:fish-shell/release-4
+      - "{{.APT_UPDATE}}"
+      - "{{.APT_INSTALL}} fish"
+      - |
+        fish -c '
+          curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source
+          fisher install jorgebucaran/fisher
+          fisher install gazorby/fish-abbreviation-tips
+        '
+
+  shells-fish-default:
+    desc: Make fish the default login shell (interactive, asks for password)
+    cmds:
+      - chsh -s "$(command -v fish)"
+
+  # -----------------------------------------------------------------------
+  # Python via uv + JupyterLab env
+  # -----------------------------------------------------------------------
+  python:
+    desc: Install uv and Python 3.12
+    cmds:
+      - "{{.APT_INSTALL}} ca-certificates build-essential"
+      - curl -LsSf https://astral.sh/uv/install.sh | sh
+      - $HOME/.local/bin/uv python install 3.12
+
+  jupyter:
+    desc: Create a uv-managed JupyterLab environment in ~/jupyterenv (run manually)
+    dir: '{{.HOME}}'
+    cmds:
+      - mkdir -p jupyterenv
+      - cd jupyterenv && $HOME/.local/bin/uv init --no-workspace || true
+      - cd jupyterenv && $HOME/.local/bin/uv python pin 3.12
+      - cd jupyterenv && $HOME/.local/bin/uv add jupyterlab ipykernel
+      - echo "Start with:  cd ~/jupyterenv && uv run jupyter lab"
+
+  pipx:
+    desc: pipx + tldr
+    cmds:
+      - "{{.APT_INSTALL}} pipx"
+      - pipx ensurepath
+      - pipx install tldr
+
+  # -----------------------------------------------------------------------
+  # CIP Pool (FAU lab workstation) extras
+  # -----------------------------------------------------------------------
+  cip-pool:
+    desc: Lab workstation extras (diodon, meld, okular, krop, hdfview, inkscape, remmina, etc.)
+    cmds:
+      - "{{.APT_INSTALL}} diodon"
+      - "{{.APT_INSTALL}} terminator"
+      - sudo snap install code --classic
+      - "{{.APT_INSTALL}} meld"
+      - "{{.APT_INSTALL}} okular"
+      - "{{.APT_INSTALL}} krop"
+      - "{{.APT_INSTALL}} hdfview"
+      - "{{.APT_INSTALL}} inkscape"
+      - "{{.APT_INSTALL}} gimp"
+      - "{{.APT_INSTALL}} gnome-system-monitor"
+      - "{{.APT_INSTALL}} baobab"
+      - "{{.APT_INSTALL}} remmina"
+
+  # -----------------------------------------------------------------------
+  # Extras: helix, eza, stickynotes, hstr, tree, kazam, pinta
+  # -----------------------------------------------------------------------
+  extras:
+    desc: Helix, eza, indicator-stickynotes, hstr, tree, kazam, pinta
+    cmds:
+      - task: helix
+      - task: eza
+      - task: stickynotes
+      - task: hstr
+      - task: tree
+      - task: kazam
+      - task: pinta
+
+  helix:
+    desc: Helix editor (PPA)
+    cmds:
+      - sudo add-apt-repository -y ppa:maveonair/helix-editor
+      - "{{.APT_UPDATE}}"
+      - "{{.APT_INSTALL}} helix"
+
+  eza:
+    desc: eza listing tool (gierens repo)
+    cmds:
+      - sudo mkdir -p /etc/apt/keyrings
+      - wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
+      - echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list
+      - "{{.APT_UPDATE}}"
+      - "{{.APT_INSTALL}} eza"
+
+  stickynotes:
+    desc: indicator-stickynotes (umang PPA)
+    cmds:
+      - sudo add-apt-repository -y ppa:umang/indicator-stickynotes
+      - "{{.APT_UPDATE}}"
+      - "{{.APT_INSTALL}} indicator-stickynotes"
+
+  hstr:
+    desc: hstr history search (Ubuntu 21.10+ uses apt; older needs PPA)
+    cmds:
+      - |
+        if apt-cache show hstr >/dev/null 2>&1; then
+          {{.APT_INSTALL}} hstr
+        else
+          sudo add-apt-repository -y ppa:ultradvorka/ppa
+          {{.APT_UPDATE}}
+          {{.APT_INSTALL}} hstr
+        fi
+
+  tree:
+    desc: tree
+    cmds:
+      - "{{.APT_INSTALL}} tree"
+
+  kazam:
+    desc: Kazam screen capture
+    cmds:
+      - "{{.APT_INSTALL}} kazam"
+
+  pinta:
+    desc: Pinta image editor (PPA)
+    cmds:
+      - sudo add-apt-repository -y ppa:pinta-maintainers/pinta-stable
+      - "{{.APT_UPDATE}}"
+      - "{{.APT_INSTALL}} pinta"
