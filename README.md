@@ -11,7 +11,7 @@ cybersecurity, networking, and Python work.
 | File | Purpose |
 |------|---------|
 | `Taskfile.yml` | Task definitions consumed by the [Task](https://taskfile.dev) runner. Groups every install command from the original list into named, reusable tasks. |
-| `UbuntuApps for new installation.txt` | The original flat list of `apt`, `snap`, `pipx`, `uv`, and PPA commands, kept for reference. |
+| `UbuntuApps.txt` | The original flat list of `apt`, `snap`, `pipx`, `uv`, and PPA commands, kept for reference. |
 | `MyAliases.sh` | Idempotent installer for `~/.aliases`, wired into `~/.bashrc` between explicit markers. Includes the `knife`, `network`, `servicecmds`, `processcmds`, `diskcmds`, `syscmds`, and `uvcmds` helpers. |
 | `README.md` | This document. |
 
