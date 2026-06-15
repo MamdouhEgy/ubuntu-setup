@@ -6,8 +6,6 @@ toolchains, shells, and lab utilities I use, plus a `MyAliases.sh` script that
 deploys a curated set of Bash aliases and helper functions for AI,
 cybersecurity, networking, and Python work.
 
-Repository: <https://github.com/MamdouhEgy/ubuntu-setup>
-
 ## Contents
 
 | File | Purpose |
