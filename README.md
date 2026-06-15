@@ -282,7 +282,7 @@ ubuntu-setup/
 ├── README.md
 ├── Taskfile.yml
 ├── MyAliases.sh
-└── UbuntuApps for new installation.txt
+└── UbuntuApps.txt
 ```
 
 ## License
